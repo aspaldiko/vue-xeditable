@@ -63,6 +63,10 @@ export default {
     value: {
       type: [String, Number]
     },
+    nullAuthorized: {
+      type: Boolean,
+      default: true
+    },
     height: {
       type: Number,
       default: 350
@@ -203,12 +207,18 @@ export default {
         return
       }
       let value = this.get_value(e.target)
-      if (this.url && this.url.length) {
-        this.send_request(value)
+      if (!this.nullAuthorized && (value == '' || value == 0)) {
+        this.$emit('nullForbidden');
+        this.editable_mode = false;
+        this.loading = false;
       } else {
-        this.value_did_changed(value)
+        if (this.url && this.url.length) {
+          this.send_request(value)
+        } else {
+          this.value_did_changed(value)
+        }
+        this.$emit('change', value);
       }
-      this.$emit('change', value);
     },
     value_did_changed(value) {
       this.editable_mode = false;
